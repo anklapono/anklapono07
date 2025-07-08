@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MOD Free Fire Max (AES)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    body { background: #000; color: white; font-family: Arial; padding: 20px; }
+    .box { background: #111; border-radius: 10px; padding: 20px; max-width: 400px; margin: auto; box-shadow: 0 0 10px #ff3c3c88; }
+    h2 { color: red; }
+    .mod-option { margin: 10px 0; }
+    input[type="checkbox"] { transform: scale(1.2); margin-right: 8px; }
+    input[type="text"] { width: 100%; padding: 8px; font-size: 14px; margin-top: 8px; border-radius: 5px; border: none; }
+    button { background: red; color: white; border: none; width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; border-radius: 6px; cursor: pointer; }
+    button.secondary { background: #333; margin-top: 6px; }
+    .status { margin-top: 15px; font-size: 14px; color: #00ff99; }
+    .json-output { background: #222; color: #00ffff; padding: 10px; margin-top: 10px; font-size: 13px; border-radius: 6px; word-break: break-word; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>✅ Menu Config | Admin: Ank Là Pô Nô</h2>
+
+    <div class="mod-option"><label><input type="checkbox" id="mod1"> Auto Ghim Đầu 70%</label></div>
+    <div class="mod-option"><label><input type="checkbox" id="mod2"> Fix Lố Đầu / Giật Tâm</label></div>
+    <div class="mod-option"><label><input type="checkbox" id="mod3"> Buff Màn Hình Siêu Mượt</label></div>
+    <div class="mod-option"><label><input type="checkbox" id="mod4"> Fix Lag Màn Hình</label></div>
+    <div class="mod-option"><label><input type="checkbox" id="mod5"> 🌎 Bug Max Nhạy Màn</label></div>
+    <div class="mod-option"><label><input type="checkbox" id="mod6"> 🖥️ Kích Hoạt Menu</label></div>
+
+    <div class="mod-option">
+      <label>🔐 Nhập UDID máy:</label>
+      <input type="text" id="udid" placeholder="Dán UDID iOS tại đây...">
+    </div>
+
+    <button onclick="activateMOD()">⚡ Kích Hoạt MOD</button>
+    <button class="secondary" onclick="resetConfig()">🗑️ Reset Cấu Hình</button>
+    <button class="secondary" onclick="exportConfig()">📤 Xuất Config (AES)</button>
+
+    <div class="status" id="status">Trạng thái: Đang chờ kích hoạt...</div>
+    <div id="jsonOutput" class="json-output" style="display:none;"></div>
+  </div>
+
+  <script>
+    const checkboxIds = ["mod1", "mod2", "mod3", "mod4", "mod5", "mod6"];
+    const udidInput = document.getElementById("udid");
+    const status = document.getElementById("status");
+    const jsonOutput = document.getElementById("jsonOutput");
+
+    const AES_KEY = "xKwzY7S3w9Bt4Rj0u5Lm2HnPqCvVaZ1G"; // ✅ Khóa AES an toàn
+    const SERVER_ENDPOINT = "https://yourserver.com/api/receive.php"; // ✅ Server nhận dữ liệu
+
+    // ✅ Thêm UDID của bạn vào đây
+    const whitelistUDIDs = [
+      "00008030-000459313C09802E", // ví dụ
+      "00008030-000538462278C02E", // ví dụ
+"00008101-001215CA3604001E", // ví dụ
+"00008030-001D28491A52802E", // ví dụ
+"00008120-001A1C1C0AC0C01E"
+    ];
+
+    function encryptAES(data, key) {
+      return CryptoJS.AES.encrypt(JSON.stringify(data), key).toString();
+    }
+
+    function decryptAES(cipher, key) {
+      try {
+        const bytes = CryptoJS.AES.decrypt(cipher, key);
+        return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Load dữ liệu từ localStorage khi mở
+    window.addEventListener("load", () => {
+      const stored = localStorage.getItem("ff_config_aes");
+      if (stored) {
+        const decrypted = decryptAES(stored, AES_KEY);
+        if (decrypted) {
+          udidInput.value = decrypted.udid || "00008030-000459313C09802E",
+"00008030-000538462278C02E",
+"00008101-001215CA3604001E",
+"00008030-001D28491A52802E",
+"00008120-001A1C1C0AC0C01E";
+          checkboxIds.forEach(id => document.getElementById(id).checked = !!decrypted[id]);
+        }
+      }
+      updateStatus();
+    });
+
+    function saveConfig() {
+      const config = { udid: udidInput.value.trim() };
+      checkboxIds.forEach(id => config[id] = document.getElementById(id).checked);
+      const encrypted = encryptAES(config, AES_KEY);
+      localStorage.setItem("ff_config_aes", encrypted);
+    }
+
+    udidInput.addEventListener("input", () => { saveConfig(); updateStatus(); });
+    checkboxIds.forEach(id => {
+      document.getElementById(id).addEventListener("change", () => {
+        saveConfig();
+        updateStatus();
+      });
+    });
+
+    function updateStatus() {
+      const mods = [];
+      const udid = udidInput.value.trim();
+      if (document.getElementById("mod1").checked) mods.push("Auto Ghim Đầu");
+      if (document.getElementById("mod2").checked) mods.push("Fix Lố Đầu");
+      if (document.getElementById("mod3").checked) mods.push("Buff Mượt");
+      if (document.getElementById("mod4").checked) mods.push("Hack Damage");
+      if (document.getElementById("mod5").checked) mods.push("Full Đỏ");
+      if (document.getElementById("mod6").checked) mods.push("iMazing");
+
+      status.textContent = mods.length > 0
+        ? `✅ Đã bật: ${mods.join(", ")} | UDID: ${udid || "chưa nhập"}`
+        : `Trạng thái: Chờ kích hoạt... | UDID: ${udid || "chưa nhập"}`;
+    }
+
+    function activateMOD() {
+      const udid = udidInput.value.trim();
+      if (!whitelistUDIDs.includes(udid)) {
+        alert("❌ UDID không nằm trong whitelist.");
+        return;
+      }
+
+      saveConfig();
+      updateStatus();
+      sendToServer();
+
+      alert("✅ MOD đã kích hoạt. Đang mở Free Fire Max...");
+
+      
+      const deepLink = "garena://freefiremax";
+      const fallback = "https://apps.apple.com/app/id1480516828";
+      window.location = deepLink;
+      setTimeout(() => {
+        window.location = fallback;
+      }, 2000); // fallback sau 2 giây nếu chưa mở được app
+    }
+
+    function resetConfig() {
+      if (confirm("Bạn chắc chắn muốn xóa cấu hình?")) {
+        localStorage.removeItem("ff_config_aes");
+        udidInput.value = "00008030-000459313C09802E",
+"00008030-000538462278C02E",
+"00008101-001215CA3604001E",
+"00008030-001D28491A52802E",
+"00008120-001A1C1C0AC0C01E";
+        checkboxIds.forEach(id => document.getElementById(id).checked = false);
+        updateStatus();
+        jsonOutput.style.display = "none";
+      }
+    }
+
+    function exportConfig() {
+      const stored = localStorage.getItem("ff_config_aes");
+      if (stored) {
+        jsonOutput.textContent = `🔐 Dữ liệu AES:\n${stored}`;
+        jsonOutput.style.display = "block";
+      } else {
+        jsonOutput.textContent = "⚠️ Không có dữ liệu.";
+        jsonOutput.style.display = "block";
+      }
+    }
+
+    function sendToServer() {
+      const stored = localStorage.getItem("ff_config_aes");
+      if (!stored) return;
+      fetch(SERVER_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: stored })
+      }).then(r => r.json()).catch(console.error);
+    }
+  </script>
+</body>
+</html>
